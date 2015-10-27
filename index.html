@@ -1,0 +1,117 @@
+<html>
+
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.js"></script>
+</head>
+
+<body>
+    <div>
+        <button id="start">Start</button>
+        <button id="pause">Pause</button>
+        <button id="stop">Stop</button>
+        <span>Nodes: <input type="number" id="nodes" value="5" step="1" min="1" max="999"></span>
+        <span>Aliens: <input type="number" id="aliens" value="15" step="1" min="1" max="999"></span>
+    </div>
+    <canvas id="board" width=600 height=400>
+        <script src="scripts/path.js"></script>
+        <script src="scripts/alien.js"></script>
+        <script src="scripts/game.js"></script>
+        <script>
+        'use strict';
+
+
+
+
+        var board = document.getElementById('board'),
+            ctx = board.getContext('2d'),
+            game = new Game();
+
+        document.getElementById('nodes').value = game.config.nodes;
+        document.getElementById('aliens').value = game.config.aliens;
+
+        document.getElementById('start').addEventListener('click', function() {
+            var config = {};
+            config.nodes = parseInt(document.getElementById('nodes').value);
+            config.aliens = parseInt(document.getElementById('aliens').value);
+            game.start(config);
+        });
+
+        document.getElementById('pause').addEventListener('click', game.pause.bind(game));
+
+        document.getElementById('stop').addEventListener('click', game.stop.bind(game));
+
+
+        function drawBoard(wps) {
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0, 0, 600, 400);
+            ctx.fillStyle = 'white';
+            drawWaypoints(wps);
+        }
+
+        function drawWaypoints(wps) {
+            var prevWP = undefined;
+            ctx.strokeStyle = "white";
+
+            wps.forEach(function(waypoint, idx) {
+                //console.log("Waypoint: ", waypoint );
+                ctx.beginPath();
+                ctx.arc(waypoint[0], waypoint[1], 5, 0, 2 * Math.PI);
+                ctx.stroke();
+
+                ctx.font = 'italic 12pt Calibri';
+                ctx.fillText(idx, waypoint[0], waypoint[1]);
+
+                if (prevWP !== undefined) {
+                    ctx.beginPath();
+                    ctx.moveTo(prevWP[0], prevWP[1]);
+                    ctx.lineTo(waypoint[0], waypoint[1]);
+                    ctx.stroke();
+                }
+
+                prevWP = waypoint;
+            });
+        }
+
+
+        function drawAlien(alien) {
+            switch (alien.type) {
+                case 0:
+                    ctx.strokeStyle = 'green';
+                    ctx.fillStyle = 'green';
+                    break;
+                case 1:
+                    ctx.strokeStyle = 'blue';
+                    ctx.fillStyle = 'blue';
+                    break;
+                case 2:
+                    ctx.strokeStyle = 'white';
+                    ctx.fillStyle = 'white';
+                    break;
+                case 3:
+                    ctx.strokeStyle = 'pink';
+                    ctx.fillStyle = 'pink';
+                    break;
+                case 4:
+                    ctx.strokeStyle = 'red';
+                    ctx.fillStyle = 'red';
+                    break;
+                case 5:
+                    ctx.strokeStyle = 'orange';
+                    ctx.fillStyle = 'orange';
+                    break;
+                default:
+                    ctx.strokeStyle = 'yellow';
+                    ctx.fillStyle = 'yellow';
+                    break;
+            }
+
+            //console.log("Alien " , alien)
+            ctx.beginPath();
+            ctx.arc(alien.x, alien.y, 4, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.stroke();
+        }
+        </script>
+</body>
+
+</html>
